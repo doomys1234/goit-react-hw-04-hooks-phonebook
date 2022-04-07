@@ -1,34 +1,50 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Phonebook from './components/Phonebook/Phonebook';
 import Contacts from './components/Contacts/Contacts';
 import Filter from './components/Filter/Filter';
 import shortid from 'shortid';
 import s from './App.module.scss';
 
-export default function App() {
+const initialContacts = [
+  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+];
+function App() {
   const [contacts, setContacts] = useState(() => {
-    return JSON.parse(window.localStorage.getItem('contacts') ?? []);
+    return JSON.parse(localStorage.getItem('contacts')) ?? initialContacts;
   });
-
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    window.localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const addContact = e => {
+    // e.preventDefault();
+    console.log(e.currentTarget);
 
-  const addContact = ({ name, number }) => {
-    console.log('App', name, number);
+    const name = e.currentTarget.elements.name.value;
+    const number = e.currentTarget.elements.number.value;
     if (contacts.find(contact => contact.name === name)) {
       alert(`${name} is already exists`);
       return;
     }
+
     const newContact = {
       id: shortid.generate(),
       name,
       number,
     };
-
-    setContacts([...contacts, newContact]);
+    setContacts(prev => [...prev, newContact]);
+    if (localStorage.getItem('contacts')) {
+      return localStorage.setItem(
+        'contacts',
+        JSON.stringify([...contacts, newContact]),
+      );
+    }
+    localStorage.setItem(
+      'contacts',
+      JSON.stringify([...initialContacts, newContact]),
+    );
+    // e.currentTarget.reset()
   };
 
   const filterChange = e => {
@@ -36,7 +52,11 @@ export default function App() {
   };
 
   const deleteContact = numId => {
-    setContacts(contacts.filter(contact => contact.id !== numId));
+    setContacts(prev => prev.filter(contact => contact.id !== numId));
+    localStorage.setItem(
+      'contacts',
+      JSON.stringify(contacts.filter(contact => contact.id !== numId)),
+    );
   };
 
   const normalizedFilter = filter.toLowerCase();
@@ -44,7 +64,6 @@ export default function App() {
   const filteredItem = contacts.filter(item =>
     item.name.toLowerCase().includes(normalizedFilter),
   );
-  console.log(filteredItem);
 
   return (
     <div className={s.container}>
@@ -57,3 +76,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import s from './Phonebook.module.scss';
 
-export default function Phonebook({ onSubmit }) {
+function Phonebook({ onSubmit }) {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
@@ -11,25 +11,16 @@ export default function Phonebook({ onSubmit }) {
     switch (name) {
       case 'name':
         setName(value);
-
         break;
       case 'number':
         setNumber(value);
-
         break;
-
       default:
         break;
     }
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    onSubmit({ name, number });
-    clearForm();
-  };
-
-  const clearForm = () => {
+  const resetForm = () => {
     setName('');
     setNumber('');
   };
@@ -38,7 +29,9 @@ export default function Phonebook({ onSubmit }) {
     <form
       className={s.form}
       onSubmit={e => {
-        handleSubmit(e);
+        e.preventDefault();
+        onSubmit(e);
+        resetForm();
       }}
     >
       <h3 className={s.title}>Name</h3>
@@ -50,9 +43,7 @@ export default function Phonebook({ onSubmit }) {
         title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
         required
         value={name}
-        onChange={e => {
-          handleChange(e);
-        }}
+        onChange={handleChange}
       />
       <h3 className={s.title}>Number</h3>
       <input
@@ -63,9 +54,7 @@ export default function Phonebook({ onSubmit }) {
         title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
         required
         value={number}
-        onChange={e => {
-          handleChange(e);
-        }}
+        onChange={handleChange}
       />
       <button className={s.button} type="submit">
         Add Contact
@@ -76,3 +65,5 @@ export default function Phonebook({ onSubmit }) {
 Phonebook.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 };
+
+export default Phonebook;
